@@ -40,12 +40,12 @@ class _ScanScreenState extends State<ScanScreen> {
       await _initializeControllerFuture;
       if (mounted) setState(() {});
     } catch (e) {
-      debugPrint("Error initializing camera: $e");
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal membuka kamera: $e')),
-        );
-      }
+      debugPrint('Error saat mengambil foto: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Pemindaian Gagal! Periksa Izin Kamera atau coba lagi.'),
+        ),
+      );
     }
   }
 
@@ -59,7 +59,7 @@ class _ScanScreenState extends State<ScanScreen> {
     final inputImage = InputImage.fromFile(imageFile);
     final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
     final RecognizedText recognizedText =
-        await textRecognizer.processImage(inputImage);
+    await textRecognizer.processImage(inputImage);
     textRecognizer.close();
     return recognizedText.text;
   }
@@ -93,9 +93,22 @@ class _ScanScreenState extends State<ScanScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_controller == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+    if (_controller == null || !_controller!.value.isInitialized) {
+      return Scaffold(
+        backgroundColor: Colors.grey[900],
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircularProgressIndicator(color: Colors.yellow),
+              SizedBox(height: 20),
+              Text(
+                'Memuat Kamera... Harap tunggu.',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+            ],
+          ),
+        ),
       );
     }
 
